@@ -1,0 +1,11 @@
+# Arquivo de configuração local (contém segredos)
+sualuz_config.yaml
+
+# Arquivos Python compilados e cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Arquivos de ambiente virtual (se usar)
+venv/
+.venv/

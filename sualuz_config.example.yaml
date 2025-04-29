@@ -1,0 +1,37 @@
+# Configurações para a API SuaLuz
+sualuz:
+  # URL base da API (geralmente não muda)
+  base_url: "https://apiapp.sualuz.com.br/telemetria/api/v1/Telemetria/atual"
+
+  # O MAC do seu medidor SuaLuz (encontrado na URL ou DevTools)
+  # Substitua pelo MAC real do seu dispositivo
+  mac: "luz-xxxxxx" # SUBSTITUA PELO SEU MAC REAL
+
+  # Tarifa de energia em R$/kWh (opcional, usada na URL, mas o script não usa para cálculo)
+  # Ajuste se sua tarifa for diferente ou remova se não quiser passar para a API
+  tarifa: 0.90637183
+
+  # O token Bearer obtido manualmente pelo DevTools do navegador
+  # ESTE TOKEN EXPIRA! Você precisará atualizá-lo periodicamente.
+  bearer_token: "COLE_O_SEU_TOKEN_BEARER_VALIDO_AQUI"
+
+# Configurações para o banco de dados InfluxDB
+influxdb:
+  # URL da sua instância InfluxDB (incluindo porta se não for a padrão 8086)
+  # Ex: "http://192.168.1.100:8086" ou "http://localhost:8086"
+  url: "http://SEU_IP_OU_HOSTNAME_INFLUXDB:8086"
+
+  # Token de API gerado no InfluxDB com permissão de escrita no bucket desejado
+  token: "SEU_TOKEN_API_DO_INFLUXDB"
+
+  # Nome da sua Organização (Org) no InfluxDB
+  org: "sua_organizacao_influx"
+
+  # Nome do Bucket (banco de dados) no InfluxDB onde os dados serão salvos
+  # Certifique-se de que este bucket existe na sua instância InfluxDB
+  bucket: "sualuz" # Ou o nome que você preferir/criou
+
+# Fuso horário local (opcional, padrão 'America/Sao_Paulo')
+# Use o nome da TZ Database (ex: 'America/Manaus', 'Europe/Lisbon')
+# Lista: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+timezone: 'America/Sao_Paulo'

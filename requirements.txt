@@ -1,0 +1,4 @@
+requests
+PyYAML
+influxdb-client>=1.30.0
+pytz
