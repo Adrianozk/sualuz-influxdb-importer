@@ -1,42 +1,47 @@
 # SuaLuz InfluxDB Importer
 
-Pipeline em Python para extrair telemetria de consumo de energia da plataforma SuaLuz, transformar os registros e armazená-los no InfluxDB para análise e visualização no Grafana.
+Pipeline em Python para extrair telemetria de consumo de energia da plataforma SuaLuz, normalizar os registros e armazená-los no InfluxDB para análise no Grafana.
 
-> Projeto independente e não oficial. A integração depende de uma API interna da plataforma SuaLuz, que pode mudar sem aviso.
+> Projeto independente e não oficial. A integração usa uma API interna da SuaLuz, que pode mudar sem aviso.
 
 ## Arquitetura
 
 ```mermaid
 flowchart LR
-    A["API SuaLuz"] --> B["Python ETL"]
+    A["API SuaLuz / Wisebyte"] --> B["ETL em Python"]
     B --> C["InfluxDB"]
     C --> D["Grafana"]
 ```
 
-## O que o projeto faz
+## Estado da integração
 
-- Extrai medições históricas ou do dia atual em intervalos de um minuto.
-- Valida datas, respostas HTTP e registros recebidos.
-- Normaliza timestamps para UTC respeitando o fuso configurado.
-- Converte cada medição em um ponto da série temporal `consumo_energia`.
-- Escreve dados em lote no InfluxDB.
-- Permite criar dashboards de potência, consumo acumulado e custo estimado.
-- Interrompe a execução com uma mensagem clara quando o token da SuaLuz expira.
+O importador foi atualizado para o contrato utilizado pelo cliente web da SuaLuz em agosto de 2026.
+
+| Contrato | Requisição | Situação |
+|---|---|---|
+| Wisebyte atual | `POST /wisebyte-site/prod/api/v0.1.0/item-pt` | Padrão |
+| Telemetria legado | `GET /telemetria/api/v1/Telemetria/atual` | Compatibilidade opcional |
+
+Na API atual, o medidor e o intervalo são enviados em JSON e as medições chegam em `response.result_array`, indexadas por timestamp. O código normaliza timestamps locais ou com offset para UTC antes da escrita.
+
+## Recursos
+
+- Consulta um dia ou intervalo de datas.
+- Coleta pontos de potência em resolução de um minuto.
+- Valida configuração, respostas HTTP e o contrato JSON.
+- Converte timestamps para UTC usando o fuso configurado.
+- Preserva a leitura do formato legado `{minuto, pt}`.
+- Escreve lotes idempotentes no InfluxDB.
+- Oferece `--dry-run` para testar API e token sem acessar o banco.
+- Possui testes automatizados e integração contínua no GitHub Actions.
 
 ## Tecnologias
 
-- Python
-- Requests
-- PyYAML
+- Python 3.9+
+- Requests e PyYAML
 - InfluxDB Client
-- InfluxDB
-- Grafana
-
-## Pré-requisitos
-
-- Python 3.9 ou superior
-- Conta e medidor acessíveis em `luz.sualuz.com.br`
-- Instância do InfluxDB com bucket e token de escrita
+- InfluxDB e Grafana
+- Pytest e GitHub Actions
 
 ## Instalação
 
@@ -49,7 +54,7 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-No Windows, ative o ambiente virtual com:
+No Windows:
 
 ```powershell
 .venv\Scripts\activate
@@ -57,75 +62,142 @@ No Windows, ative o ambiente virtual com:
 
 ## Configuração
 
-Crie o arquivo de configuração a partir do exemplo:
+Copie o modelo:
 
 ```bash
 cp sualuz_config.example.yaml sualuz_config.yaml
 ```
 
-Preencha no `sualuz_config.yaml`:
+Preencha `sualuz_config.yaml`:
 
-- `sualuz.bearer_token`: token Bearer obtido na sessão web da SuaLuz.
-- `sualuz.mac`: identificador do medidor.
-- `influxdb.url`: endereço da instância.
-- `influxdb.token`: token com permissão de escrita.
-- `influxdb.org`: organização do InfluxDB.
-- `influxdb.bucket`: bucket de destino.
-- `timezone`: fuso local, com padrão `America/Sao_Paulo`.
+- `sualuz.mac`: identificador do medidor, normalmente no formato `luz-xxxxxx`;
+- `sualuz.bearer_token`: token da sessão web da SuaLuz;
+- `influxdb.url`: URL da instância;
+- `influxdb.token`: token com permissão de escrita;
+- `influxdb.org`: organização;
+- `influxdb.bucket`: bucket de destino;
+- `timezone`: fuso local usado quando a API retorna timestamp sem offset.
 
-### Como obter o token da SuaLuz
+O arquivo real está no `.gitignore`. Nunca publique tokens, respostas brutas ou identificadores pessoais.
 
-1. Entre em `luz.sualuz.com.br`.
-2. Abra as Ferramentas do Desenvolvedor do navegador.
-3. Na aba **Rede**, carregue os dados de consumo.
-4. Localize uma requisição para o endpoint de telemetria.
-5. Copie somente o valor que aparece depois de `Authorization: Bearer`.
+### Obter um token atualizado
 
-> Nunca publique seu token da SuaLuz ou do InfluxDB. O arquivo `sualuz_config.yaml` deve permanecer fora do controle de versão.
+1. Entre em `https://luz.sualuz.com.br`.
+2. Abra as Ferramentas do Desenvolvedor e a aba **Rede**.
+3. Acesse **Consumo e Economia → Dia**.
+4. Localize a requisição `item-pt`.
+5. Em **Cabeçalhos da requisição**, copie apenas o conteúdo depois de `Authorization: Bearer`.
 
-## Uso
+O token expira periodicamente. Um HTTP `401` indica que ele precisa ser renovado.
 
-Buscar um dia específico:
+## Validar a API antes de gravar
 
-```bash
-python get_sualuz_data.py --start_date 2025-04-28
-```
-
-Buscar um intervalo:
+O primeiro teste recomendado consulta um dia sem conectar ao InfluxDB:
 
 ```bash
-python get_sualuz_data.py --start_date 2025-04-20 --end_date 2025-04-27
+python get_sualuz_data.py \
+  --start_date 2026-08-31 \
+  --dry-run
 ```
 
-Usar outro arquivo de configuração:
+Uma execução válida informa a quantidade e o intervalo UTC dos pontos, sem exibir valores nem salvar a resposta bruta.
+
+## Importar dados
+
+Um dia:
 
 ```bash
-python get_sualuz_data.py --start_date 2025-04-28 --config /caminho/config.yaml
+python get_sualuz_data.py --start_date 2026-08-31
 ```
 
-## Modelo gravado no InfluxDB
+Intervalo:
 
-- Measurement: `consumo_energia`
-- Tags: `fonte` e `mac_medidor`
-- Field: `potencia_W`
-- Timestamp: UTC
+```bash
+python get_sualuz_data.py \
+  --start_date 2026-08-01 \
+  --end_date 2026-08-31
+```
 
-## Ideias de visualização
+Outro arquivo de configuração:
 
-No Grafana, os dados podem alimentar painéis de:
+```bash
+python get_sualuz_data.py \
+  --start_date 2026-08-31 \
+  --config /caminho/sualuz_config.yaml
+```
 
-- potência instantânea;
-- consumo por hora ou dia;
-- custo estimado;
-- comparação entre períodos;
-- detecção de picos de consumo.
+## Modelo no InfluxDB
 
-## Limitações conhecidas
+| Tipo | Valor |
+|---|---|
+| Measurement | `consumo_energia` |
+| Tags | `fonte=sualuz`, `mac_medidor=<identificador>` |
+| Field | `potencia_W` |
+| Timestamp | UTC |
 
-- O token Bearer da SuaLuz expira e precisa ser renovado manualmente.
-- Mudanças na API interna podem exigir ajustes no extrator.
-- O projeto não possui vínculo com a SuaLuz.
+Reexecutar o mesmo período é seguro: no InfluxDB, measurement, tags e timestamp iguais substituem o mesmo ponto em vez de criar uma duplicata lógica.
+
+## Contrato atual da API
+
+Exemplo anonimizado do corpo enviado:
+
+```json
+{
+  "items": [
+    {
+      "luz_id": "xxxxxx",
+      "initial_date": "2026-08-31 00:00:00",
+      "final_date": "2026-08-31 23:59:59",
+      "period": "minute",
+      "time_wanted": 1
+    }
+  ]
+}
+```
+
+O prefixo `luz-` é removido somente no `luz_id` enviado à Wisebyte. A tag `mac_medidor` preserva o identificador configurado, mantendo compatibilidade com séries e dashboards existentes.
+
+## Modo legado
+
+Para uma instalação que ainda responda pelo endpoint antigo:
+
+```yaml
+sualuz:
+  api_mode: "legacy"
+  base_url: "https://apiapp.sualuz.com.br/telemetria/api/v1/Telemetria/atual"
+```
+
+## Testes
+
+```bash
+pip install -r requirements-dev.txt
+pytest -q
+```
+
+Os testes cobrem:
+
+- montagem do corpo Wisebyte;
+- timestamps locais e ISO 8601 com offset;
+- ordenação e conversão da potência;
+- resposta legada;
+- detecção de mudança no contrato.
+
+## Diagnóstico
+
+| Sintoma | Causa provável | Ação |
+|---|---|---|
+| HTTP `401` | Token expirado | Obtenha outro token no navegador |
+| `response.result_array` ausente | Mudança na resposta | Execute `--dry-run` e revise o contrato |
+| Nenhum ponto retornado | Medidor sem dados no período | Teste um dia que possua leitura no site |
+| Falha no ping do InfluxDB | URL, rede ou serviço | Verifique a URL e a porta `8086` |
+| Erro de escrita | Token, organização ou bucket | Revise as permissões do token do InfluxDB |
+
+## Limitações
+
+- Não existe uma API pública documentada para esta integração.
+- O token da SuaLuz expira e precisa ser renovado manualmente.
+- A qualidade e a disponibilidade dos pontos dependem do medidor e da plataforma.
 
 ## Autor
 
-Desenvolvido por [Adriano Luís Fernandes](https://github.com/Adrianozk) como parte do seu homelab e dos estudos em Engenharia de Dados, automação e observabilidade.
+Desenvolvido por [Adriano Luís Fernandes](https://github.com/Adrianozk) como projeto de Engenharia de Dados, automação e observabilidade no homelab.
