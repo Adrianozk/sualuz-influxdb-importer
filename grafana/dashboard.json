@@ -151,7 +151,7 @@
         "spec": {
           "id": 10,
           "title": "Potência Média no Período (W)",
-          "description": "Custo estimado do período selecionado usando a variável tarifa_kwh.",
+          "description": "Potência média durante o período selecionado.",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -237,7 +237,7 @@
         "spec": {
           "id": 11,
           "title": "Potência Média Hoje (W)",
-          "description": "Maior potência observada durante o período selecionado.",
+          "description": "Potência média desde o início do dia no fuso configurado pela consulta.",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -323,7 +323,7 @@
         "spec": {
           "id": 2,
           "title": "Consumo Hoje (kWh)",
-          "description": "Potência média durante o período selecionado.",
+          "description": "Energia consumida desde o início do dia, calculada a partir das amostras de potência.",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -411,7 +411,7 @@
         "spec": {
           "id": 3,
           "title": "Custo Hoje (R$)",
-          "description": "Potência média desde o início do dia no fuso configurado pela consulta.",
+          "description": "Custo estimado do consumo de hoje usando a variável tarifa_kwh.",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -500,7 +500,7 @@
         "spec": {
           "id": 4,
           "title": "Consumo Diário (kWh)",
-          "description": "Energia consumida desde o início do dia, calculada a partir das amostras de potência.",
+          "description": "Energia consumida por dia no período selecionado.",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -614,7 +614,7 @@
         "spec": {
           "id": 5,
           "title": "Custo Diário (R$)",
-          "description": "Custo estimado do consumo de hoje usando a variável tarifa_kwh.",
+          "description": "Custo estimado por dia usando a variável tarifa_kwh.",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -729,7 +729,7 @@
         "spec": {
           "id": 6,
           "title": "Pico de Potência Hoje (W)",
-          "description": "Energia consumida por dia no período selecionado.",
+          "description": "Maior potência observada desde o início do dia.",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -817,7 +817,7 @@
         "spec": {
           "id": 7,
           "title": "Consumo Total no Período (kWh)",
-          "description": "Custo estimado por dia usando a variável tarifa_kwh.",
+          "description": "Energia consumida durante todo o período selecionado.",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -895,7 +895,7 @@
         "spec": {
           "id": 8,
           "title": "Custo no Período (R$)",
-          "description": "Maior potência observada desde o início do dia.",
+          "description": "Custo estimado do período selecionado usando a variável tarifa_kwh.",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -973,7 +973,7 @@
         "spec": {
           "id": 9,
           "title": "Pico de Potência no Período (W)",
-          "description": "Energia consumida durante todo o período selecionado.",
+          "description": "Maior potência observada durante o período selecionado.",
           "links": [],
           "data": {
             "kind": "QueryGroup",
