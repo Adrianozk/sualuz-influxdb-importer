@@ -1124,13 +1124,20 @@
                     "steps": [
                       {
                         "value": 0,
-                        "color": "blue"
+                        "color": "green"
+                      },
+                      {
+                        "value": 77,
+                        "color": "#EAB839"
+                      },
+                      {
+                        "value": 105,
+                        "color": "red"
                       }
                     ]
                   },
                   "color": {
-                    "mode": "fixed",
-                    "fixedColor": "blue"
+                    "mode": "thresholds"
                   },
                   "custom": {
                     "axisBorderShow": false,
@@ -1150,7 +1157,7 @@
                       "type": "linear"
                     },
                     "thresholdsStyle": {
-                      "mode": "off"
+                      "mode": "line"
                     }
                   }
                 },
@@ -1233,12 +1240,19 @@
                       {
                         "value": 0,
                         "color": "green"
+                      },
+                      {
+                        "value": 70,
+                        "color": "#EAB839"
+                      },
+                      {
+                        "value": 91,
+                        "color": "red"
                       }
                     ]
                   },
                   "color": {
-                    "mode": "fixed",
-                    "fixedColor": "green"
+                    "mode": "thresholds"
                   },
                   "custom": {
                     "axisBorderShow": false,
@@ -1258,7 +1272,7 @@
                       "type": "linear"
                     },
                     "thresholdsStyle": {
-                      "mode": "off"
+                      "mode": "line"
                     }
                   }
                 },
@@ -1339,13 +1353,20 @@
                     "steps": [
                       {
                         "value": 0,
-                        "color": "blue"
+                        "color": "green"
+                      },
+                      {
+                        "value": 330,
+                        "color": "#EAB839"
+                      },
+                      {
+                        "value": 450,
+                        "color": "red"
                       }
                     ]
                   },
                   "color": {
-                    "mode": "fixed",
-                    "fixedColor": "blue"
+                    "mode": "thresholds"
                   },
                   "custom": {
                     "axisBorderShow": false,
@@ -1365,7 +1386,7 @@
                       "type": "linear"
                     },
                     "thresholdsStyle": {
-                      "mode": "off"
+                      "mode": "line"
                     }
                   }
                 },
@@ -1448,12 +1469,19 @@
                       {
                         "value": 0,
                         "color": "green"
+                      },
+                      {
+                        "value": 300,
+                        "color": "#EAB839"
+                      },
+                      {
+                        "value": 390,
+                        "color": "red"
                       }
                     ]
                   },
                   "color": {
-                    "mode": "fixed",
-                    "fixedColor": "green"
+                    "mode": "thresholds"
                   },
                   "custom": {
                     "axisBorderShow": false,
@@ -1473,7 +1501,7 @@
                       "type": "linear"
                     },
                     "thresholdsStyle": {
-                      "mode": "off"
+                      "mode": "line"
                     }
                   }
                 },
