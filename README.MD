@@ -35,6 +35,40 @@ Na API atual, o medidor e o intervalo são enviados em JSON e as medições cheg
 - Oferece `--dry-run` para testar API e token sem acessar o banco.
 - Possui testes automatizados e integração contínua no GitHub Actions.
 
+## Dashboard Grafana
+
+O repositório inclui um dashboard pronto para visualizar os dados gravados pelo
+importador:
+
+![Dashboard de monitoramento de energia SuaLuz](docs/images/grafana-dashboard.png)
+
+O dashboard apresenta:
+
+- potência instantânea ao longo do período selecionado;
+- consumo, custo, pico e potência média do dia;
+- consumo, custo, pico e potência média do período;
+- consumo e custo agregados por dia, semana e mês.
+
+### Agregações semanais e mensais
+
+![Consumo e custo semanais e mensais](docs/images/grafana-weekly-monthly.png)
+
+Os thresholds semanais são proporcionais aos limites diários, enquanto os
+mensais usam um mês-base de 30 dias.
+
+### Importar o dashboard
+
+1. Configure no Grafana uma fonte de dados **InfluxDB 2.x** usando a linguagem
+   de consulta **Flux**.
+2. Acesse **Dashboards → New → Import**.
+3. Envie o arquivo [`grafana/dashboard.json`](grafana/dashboard.json).
+4. Selecione a fonte InfluxDB, o bucket e o medidor nos controles do dashboard.
+5. Informe a tarifa atual em `Tarifa R$/kWh` para calcular os painéis de custo.
+
+O template espera o mesmo modelo gravado por este importador:
+`consumo_energia`, campo `potencia_W` e tag `mac_medidor`. A tarifa é apenas uma
+variável do Grafana; alterá-la não modifica os dados armazenados no InfluxDB.
+
 ## Tecnologias
 
 - Python 3.9+
