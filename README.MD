@@ -49,6 +49,13 @@ O dashboard apresenta:
 - consumo, custo, pico e potência média do período;
 - consumo e custo agregados por dia, semana e mês.
 
+### Agregações semanais e mensais
+
+![Consumo e custo semanais e mensais](docs/images/grafana-weekly-monthly.png)
+
+Os thresholds semanais são proporcionais aos limites diários, enquanto os
+mensais usam um mês-base de 30 dias.
+
 ### Importar o dashboard
 
 1. Configure no Grafana uma fonte de dados **InfluxDB 2.x** usando a linguagem
