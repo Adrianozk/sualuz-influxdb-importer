@@ -40,12 +40,14 @@ Na API atual, o medidor e o intervalo são enviados em JSON e as medições cheg
 O repositório inclui um dashboard pronto para visualizar os dados gravados pelo
 importador:
 
+![Dashboard de monitoramento de energia SuaLuz](docs/images/grafana-dashboard.png)
+
 O dashboard apresenta:
 
 - potência instantânea ao longo do período selecionado;
 - consumo, custo, pico e potência média do dia;
 - consumo, custo, pico e potência média do período;
-- consumo e custo agregados por dia.
+- consumo e custo agregados por dia, semana e mês.
 
 ### Importar o dashboard
 

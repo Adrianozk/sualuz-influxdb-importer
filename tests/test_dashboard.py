@@ -20,3 +20,13 @@ def test_dashboard_is_portable_and_matches_the_importer_schema():
     # a concrete SuaLuz meter identifier.
     assert "dfwths7llpxq8e" not in dashboard_text
     assert re.search(r'"luz-[0-9a-f]+"', dashboard_text, re.IGNORECASE) is None
+
+    panel_titles = {
+        panel["spec"]["title"] for panel in dashboard["spec"]["elements"].values()
+    }
+    assert {
+        "Consumo Semanal (kWh)",
+        "Custo Semanal (R$)",
+        "Consumo Mensal (kWh)",
+        "Custo Mensal (R$)",
+    } <= panel_titles
